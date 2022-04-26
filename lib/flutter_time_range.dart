@@ -203,11 +203,12 @@ class _TimeRangePickerState extends State<TimeRangePicker>
       });
     });
 
-    _jamFrom = widget.is24Format
-        ? widget.initialFromHour!
-        : widget.initialFromHour! > 12
-            ? (widget.initialFromHour! - 12)
-            : widget.initialFromHour!;
+    _jamFrom = widget.fromMinHourValue ??
+        (widget.is24Format
+            ? widget.initialFromHour!
+            : widget.initialFromHour! > 12
+                ? (widget.initialFromHour! - 12)
+                : widget.initialFromHour!);
 
     _jamTo = widget.is24Format
         ? widget.initialToHour!
@@ -216,7 +217,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
             : widget.initialToHour!;
 
     _menitFrom = widget.initialFromMinutes!;
-    _menitTo = widget.initialToMinutes!;
+    _menitTo = widget.fromMinMinuteValue ?? widget.initialToMinutes!;
 
     if (!widget.is24Format) {
       _maxJamValue = 12;
@@ -357,36 +358,22 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             });
                                           },
                                         )
-                                      : InkWell(
-                                          onTap: () {
-                                            if (widget.editable) {
-                                              setState(() {
-                                                isEdit[0] = true;
-                                                textFocus[0].requestFocus();
-                                              });
-                                            }
-                                          },
-                                          child: NumberPicker(
-                                              minValue:
-                                                  widget.fromMinHourValue ??
-                                                      _minJamValue,
-                                              maxValue:
-                                                  widget.fromMaxHourValue ??
-                                                      _maxJamValue,
-                                              value: widget.fromMinHourValue ??
-                                                  _jamFrom,
-                                              zeroPad: true,
-                                              textStyle:
-                                                  widget.unselectedTimeStyle,
-                                              selectedTextStyle:
-                                                  widget.selectedTimeStyle,
-                                              infiniteLoop: true,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _jamFrom = value;
-                                                });
-                                              }),
-                                        ),
+                                      : NumberPicker(
+                                          minValue: widget.fromMinHourValue ??
+                                              _minJamValue,
+                                          maxValue: widget.fromMaxHourValue ??
+                                              _maxJamValue,
+                                          value: _jamFrom,
+                                          zeroPad: true,
+                                          textStyle: widget.unselectedTimeStyle,
+                                          selectedTextStyle:
+                                              widget.selectedTimeStyle,
+                                          infiniteLoop: true,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _jamFrom = value;
+                                            });
+                                          }),
                                 ),
                               ),
                               Padding(
@@ -426,37 +413,23 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             });
                                           },
                                         )
-                                      : InkWell(
-                                          onTap: () {
-                                            if (widget.editable) {
-                                              setState(() {
-                                                isEdit[1] = true;
-                                                textFocus[1].requestFocus();
-                                              });
-                                            }
-                                          },
-                                          child: NumberPicker(
-                                              minValue:
-                                                  widget.fromMinMinuteValue ??
-                                                      0,
-                                              maxValue:
-                                                  widget.fromMaxMinuteValue ??
-                                                      59,
-                                              value:
-                                                  widget.fromMinMinuteValue ??
-                                                      _menitFrom,
-                                              zeroPad: true,
-                                              textStyle:
-                                                  widget.unselectedTimeStyle,
-                                              selectedTextStyle:
-                                                  widget.selectedTimeStyle,
-                                              infiniteLoop: true,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _menitFrom = value;
-                                                });
-                                              }),
-                                        ),
+                                      : NumberPicker(
+                                          minValue:
+                                              widget.fromMinMinuteValue ?? 0,
+                                          maxValue:
+                                              widget.fromMaxMinuteValue ?? 59,
+                                          value: widget.fromMinMinuteValue ??
+                                              _menitFrom,
+                                          zeroPad: true,
+                                          textStyle: widget.unselectedTimeStyle,
+                                          selectedTextStyle:
+                                              widget.selectedTimeStyle,
+                                          infiniteLoop: true,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _menitFrom = value;
+                                            });
+                                          }),
                                 ),
                               ),
                             ],
@@ -529,31 +502,20 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             });
                                           },
                                         )
-                                      : InkWell(
-                                          onTap: () {
-                                            if (widget.editable) {
-                                              setState(() {
-                                                isEdit[2] = true;
-                                                textFocus[2].requestFocus();
-                                              });
-                                            }
-                                          },
-                                          child: NumberPicker(
-                                              minValue: _jamFrom,
-                                              maxValue: _maxJamValue,
-                                              value: _jamFrom,
-                                              zeroPad: true,
-                                              textStyle:
-                                                  widget.unselectedTimeStyle,
-                                              selectedTextStyle:
-                                                  widget.selectedTimeStyle,
-                                              infiniteLoop: true,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _jamTo = value;
-                                                });
-                                              }),
-                                        ),
+                                      : NumberPicker(
+                                          minValue: _jamFrom,
+                                          maxValue: _maxJamValue,
+                                          value: _jamFrom,
+                                          zeroPad: true,
+                                          textStyle: widget.unselectedTimeStyle,
+                                          selectedTextStyle:
+                                              widget.selectedTimeStyle,
+                                          infiniteLoop: true,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _jamTo = value;
+                                            });
+                                          }),
                                 ),
                               ),
                               Padding(
@@ -593,31 +555,20 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             });
                                           },
                                         )
-                                      : InkWell(
-                                          onTap: () {
-                                            if (widget.editable) {
-                                              setState(() {
-                                                isEdit[3] = true;
-                                                textFocus[3].requestFocus();
-                                              });
-                                            }
-                                          },
-                                          child: NumberPicker(
-                                              minValue: _menitFrom + 1,
-                                              maxValue: 59,
-                                              value: _menitFrom + 1,
-                                              zeroPad: true,
-                                              textStyle:
-                                                  widget.unselectedTimeStyle,
-                                              selectedTextStyle:
-                                                  widget.selectedTimeStyle,
-                                              infiniteLoop: true,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _menitTo = value;
-                                                });
-                                              }),
-                                        ),
+                                      : NumberPicker(
+                                          minValue: _menitFrom + 1,
+                                          maxValue: 59,
+                                          value: _menitTo,
+                                          zeroPad: true,
+                                          textStyle: widget.unselectedTimeStyle,
+                                          selectedTextStyle:
+                                              widget.selectedTimeStyle,
+                                          infiniteLoop: true,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _menitTo = value;
+                                            });
+                                          }),
                                 ),
                               ),
                             ],
