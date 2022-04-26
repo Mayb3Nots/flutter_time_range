@@ -373,7 +373,8 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                               maxValue:
                                                   widget.fromMaxHourValue ??
                                                       _maxJamValue,
-                                              value: _jamFrom,
+                                              value: widget.fromMinHourValue ??
+                                                  _jamFrom,
                                               zeroPad: true,
                                               textStyle:
                                                   widget.unselectedTimeStyle,
@@ -441,7 +442,9 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                               maxValue:
                                                   widget.fromMaxMinuteValue ??
                                                       59,
-                                              value: _menitFrom,
+                                              value:
+                                                  widget.fromMinMinuteValue ??
+                                                      _menitFrom,
                                               zeroPad: true,
                                               textStyle:
                                                   widget.unselectedTimeStyle,
@@ -538,7 +541,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           child: NumberPicker(
                                               minValue: _jamFrom,
                                               maxValue: _maxJamValue,
-                                              value: _jamTo,
+                                              value: _jamFrom,
                                               zeroPad: true,
                                               textStyle:
                                                   widget.unselectedTimeStyle,
@@ -602,7 +605,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           child: NumberPicker(
                                               minValue: _menitFrom + 1,
                                               maxValue: 59,
-                                              value: _menitTo,
+                                              value: _menitFrom + 1,
                                               zeroPad: true,
                                               textStyle:
                                                   widget.unselectedTimeStyle,
