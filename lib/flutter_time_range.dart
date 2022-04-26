@@ -118,6 +118,14 @@ class TimeRangePicker extends StatefulWidget {
   /// Color of indicator active tab
   final Color indicatorColor;
 
+  final int? fromMinHourValue;
+
+  final int? fromMaxHourValue;
+
+  final int? fromMinMinuteValue;
+
+  final int? fromMaxMinuteValue;
+
   TimeRangePicker(
       {Key? key,
       @required this.initialFromHour,
@@ -155,7 +163,11 @@ class TimeRangePicker extends StatefulWidget {
           const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
       this.activeLabelColor = Colors.blueAccent,
       this.inactiveLabelColor = Colors.grey,
-      this.indicatorColor = Colors.blueAccent})
+      this.indicatorColor = Colors.blueAccent,
+      this.fromMinHourValue,
+      this.fromMaxHourValue,
+      this.fromMinMinuteValue,
+      this.fromMaxMinuteValue})
       : super(key: key);
 
   @override
@@ -355,8 +367,12 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             }
                                           },
                                           child: NumberPicker(
-                                              minValue: _minJamValue,
-                                              maxValue: _maxJamValue,
+                                              minValue:
+                                                  widget.fromMinHourValue ??
+                                                      _minJamValue,
+                                              maxValue:
+                                                  widget.fromMaxHourValue ??
+                                                      _maxJamValue,
                                               value: _jamFrom,
                                               zeroPad: true,
                                               textStyle:
@@ -419,8 +435,12 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             }
                                           },
                                           child: NumberPicker(
-                                              minValue: 0,
-                                              maxValue: 59,
+                                              minValue:
+                                                  widget.fromMinMinuteValue ??
+                                                      0,
+                                              maxValue:
+                                                  widget.fromMaxMinuteValue ??
+                                                      59,
                                               value: _menitFrom,
                                               zeroPad: true,
                                               textStyle:
@@ -516,7 +536,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             }
                                           },
                                           child: NumberPicker(
-                                              minValue: _minJamValue,
+                                              minValue: _jamFrom,
                                               maxValue: _maxJamValue,
                                               value: _jamTo,
                                               zeroPad: true,
@@ -580,7 +600,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                             }
                                           },
                                           child: NumberPicker(
-                                              minValue: 0,
+                                              minValue: _menitFrom + 1,
                                               maxValue: 59,
                                               value: _menitTo,
                                               zeroPad: true,
