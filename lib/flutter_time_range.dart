@@ -1,9 +1,6 @@
-library flutter_time_range;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:toggle_switch/toggle_switch.dart';
 
 typedef onSelectCallback = void Function(TimeOfDay from, TimeOfDay to);
 typedef onCancelCallback = void Function();
@@ -118,11 +115,11 @@ class TimeRangePicker extends StatefulWidget {
   /// Color of indicator active tab
   final Color indicatorColor;
 
-  final int? fromMinHourValue;
+  final int fromMinHourValue;
 
   final int? fromMaxHourValue;
 
-  final int? fromMinMinuteValue;
+  final int fromMinMinuteValue;
 
   final int? fromMaxMinuteValue;
 
@@ -164,9 +161,9 @@ class TimeRangePicker extends StatefulWidget {
       this.activeLabelColor = Colors.blueAccent,
       this.inactiveLabelColor = Colors.grey,
       this.indicatorColor = Colors.blueAccent,
-      this.fromMinHourValue,
+      this.fromMinHourValue = 0,
       this.fromMaxHourValue,
-      this.fromMinMinuteValue,
+      this.fromMinMinuteValue = 0,
       this.fromMaxMinuteValue})
       : super(key: key);
 
@@ -184,6 +181,7 @@ class _TimeRangePickerState extends State<TimeRangePicker>
   int _selectedTab = 0;
   int _maxJamValue = 23;
   int _minJamValue = 0;
+
   BoxDecoration defaultDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(7),
       border: Border.all(color: Colors.grey[500]!));
@@ -203,22 +201,16 @@ class _TimeRangePickerState extends State<TimeRangePicker>
       });
     });
 
-    _jamFrom = widget.fromMinHourValue ??
-        (widget.is24Format
-            ? widget.initialFromHour!
-            : widget.initialFromHour! > 12
-                ? (widget.initialFromHour! - 12)
-                : widget.initialFromHour!);
+    _jamFrom = widget.fromMinHourValue;
 
-    _jamTo = widget.is24Format
-        ? widget.initialToHour!
-        : widget.initialToHour! > 12
-            ? (widget.initialToHour! - 12)
-            : widget.initialToHour!;
+    _jamTo = widget.fromMinHourValue;
 
     _menitFrom = widget.initialFromMinutes!;
-    _menitTo = widget.fromMinMinuteValue ?? widget.initialToMinutes!;
-
+    _menitTo = widget.fromMinMinuteValue + 1;
+    if (_menitFrom == 59) {
+      _menitTo = 0;
+      _jamTo = _jamTo + 1;
+    }
     if (!widget.is24Format) {
       _maxJamValue = 12;
       _minJamValue = 1;
@@ -304,22 +296,8 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                               ? Container(
                                   height: 30,
                                 )
-                              : Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
-                                  child: ToggleSwitch(
-                                    minWidth: 90.0,
-                                    minHeight: 30,
-                                    cornerRadius: 20.0,
-                                    activeBgColor: widget.activeBgColor,
-                                    activeFgColor: widget.activeFgColor,
-                                    inactiveBgColor: widget.inactiveBgColor,
-                                    inactiveFgColor: widget.inactiveFgColor,
-                                    labels: ['AM', 'PM'],
-                                    initialLabelIndex: fromIndex,
-                                    onToggle: (index) {
-                                      fromIndex = index;
-                                    },
-                                  ),
+                              : Container(
+                                  height: 30,
                                 ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -359,10 +337,10 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           },
                                         )
                                       : NumberPicker(
-                                          minValue: widget.fromMinHourValue ??
-                                              _minJamValue,
-                                          maxValue: widget.fromMaxHourValue ??
-                                              _maxJamValue,
+                                          minValue: widget.fromMinHourValue,
+                                          maxValue: (widget.fromMaxHourValue ??
+                                                  _maxJamValue) -
+                                              (_menitFrom == 59 ? 1 : 0),
                                           value: _jamFrom,
                                           zeroPad: true,
                                           textStyle: widget.unselectedTimeStyle,
@@ -371,6 +349,25 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           infiniteLoop: true,
                                           onChanged: (value) {
                                             setState(() {
+                                              if (value ==
+                                                  widget.fromMinHourValue) {
+                                                _menitFrom =
+                                                    widget.fromMinMinuteValue;
+
+                                                _menitTo =
+                                                    widget.fromMinMinuteValue +
+                                                        1;
+                                              }
+                                              if (_menitFrom >= 59) {
+                                                _jamTo = value + 1;
+                                                _menitTo =
+                                                    widget.fromMinMinuteValue;
+                                              } else {
+                                                _jamTo = value;
+                                              }
+                                              if (_menitFrom == 59 &&
+                                                  value == 23) return;
+
                                               _jamFrom = value;
                                             });
                                           }),
@@ -414,12 +411,12 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           },
                                         )
                                       : NumberPicker(
-                                          minValue:
-                                              widget.fromMinMinuteValue ?? 0,
-                                          maxValue:
-                                              widget.fromMaxMinuteValue ?? 59,
-                                          value: widget.fromMinMinuteValue ??
-                                              _menitFrom,
+                                          minValue: _jamFrom ==
+                                                  widget.fromMinHourValue
+                                              ? widget.fromMinMinuteValue
+                                              : 0,
+                                          maxValue: _jamFrom == 23 ? 58 : 59,
+                                          value: _menitFrom,
                                           zeroPad: true,
                                           textStyle: widget.unselectedTimeStyle,
                                           selectedTextStyle:
@@ -427,7 +424,20 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           infiniteLoop: true,
                                           onChanged: (value) {
                                             setState(() {
-                                              _menitFrom = value;
+                                              if (value + 1 == 60) {
+                                                _menitTo = 0;
+                                                _jamTo = _jamFrom + 1;
+                                                _menitFrom = value;
+                                              } else {
+                                                if (_jamFrom ==
+                                                    widget.fromMinHourValue) {
+                                                  _menitFrom =
+                                                      widget.fromMinMinuteValue;
+                                                } else {
+                                                  _menitTo = value + 1;
+                                                  _menitFrom = value;
+                                                }
+                                              }
                                             });
                                           }),
                                 ),
@@ -448,22 +458,8 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                               ? Container(
                                   height: 30,
                                 )
-                              : Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
-                                  child: ToggleSwitch(
-                                    minWidth: 90.0,
-                                    minHeight: 30,
-                                    cornerRadius: 20.0,
-                                    activeBgColor: widget.activeBgColor,
-                                    activeFgColor: widget.activeFgColor,
-                                    inactiveBgColor: widget.inactiveBgColor,
-                                    inactiveFgColor: widget.inactiveFgColor,
-                                    labels: ['AM', 'PM'],
-                                    initialLabelIndex: toIndex,
-                                    onToggle: (index) {
-                                      toIndex = index;
-                                    },
-                                  ),
+                              : Container(
+                                  height: 30,
                                 ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -556,7 +552,10 @@ class _TimeRangePickerState extends State<TimeRangePicker>
                                           },
                                         )
                                       : NumberPicker(
-                                          minValue: _menitFrom + 1,
+                                          minValue:
+                                              _jamTo == widget.fromMinHourValue
+                                                  ? (widget.fromMinMinuteValue)
+                                                  : 0,
                                           maxValue: 59,
                                           value: _menitTo,
                                           zeroPad: true,
